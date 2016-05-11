@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="activityTitlebarNoSearch" parent="android:Theme.Light">
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowNoTitle">false</item>
+        <item name="android:windowTitleSize">@dimen/global_title_height</item>
+        <item name="android:windowTitleBackgroundStyle">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+</resources>

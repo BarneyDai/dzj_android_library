@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="array_main_modules" >
+
+        <item>数据操作</item>
+        <item>网络操作</item>
+        <item>图片操作</item>
+        <item>H5交互</item>
+        <item>自定义控件</item>
+        <item>自定义相机</item>
+        <item>多模板ListView</item>
+        <item>插件化</item>
+        <item>对话框</item>
+        <item>可配置的title</item>
+        <item>启动进程</item>
+        <item>多线程操作</item>
+        <item>好用的动画</item>
+        <item>启动系统页面</item>
+        <item>设备信息</item>
+        <item>崩溃日志</item>
+
+    </array>
+
+    <array name="array_data_module">
+        <item>文件操作</item>
+        <item>数据库操作</item>
+        <item>配置文件操作</item>
+    </array>
+
+</resources>

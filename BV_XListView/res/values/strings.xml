@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">XListView</string>
+
+
+    <string name="xlistview_header_hint_normal" translatable="false">下拉刷新</string>
+    <string name="xlistview_header_hint_ready" translatable="false">松开刷新数据</string>
+    <string name="xlistview_header_hint_loading" translatable="false">正在加载&#8230;</string>
+    <string name="xlistview_header_last_time" translatable="false">上次更新时间：</string>
+    <string name="xlistview_footer_hint_normal" translatable="false">查看更多</string>
+    <string name="xlistview_footer_hint_ready" translatable="false">松开载入更多</string>
+
+    <string name="img_desc" translatable="false">theimg</string>
+</resources>

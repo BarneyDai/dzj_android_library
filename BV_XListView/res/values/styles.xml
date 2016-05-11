@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="progressbar_small">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">20dp</item>
+        <item name="android:minHeight">20dp</item>
+        <item name="android:indeterminate">true</item>
+        <item name="android:indeterminateDrawable">@drawable/loading1</item>
+    </style>
+
+    <style name="text_small">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/color_text_light</item>
+    </style>
+
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 全局标题栏高度   -->
+    <dimen name="global_title_height">50dp</dimen>
+
+</resources>
