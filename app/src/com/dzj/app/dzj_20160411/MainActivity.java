@@ -18,6 +18,7 @@ public class MainActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
 
         initView();
+
     }
 
     @Override
