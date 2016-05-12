@@ -19,6 +19,7 @@ public class MainActivity extends BasicActivity {
 
         initView();
 
+
     }
 
     @Override
