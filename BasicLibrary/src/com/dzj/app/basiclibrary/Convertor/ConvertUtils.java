@@ -44,14 +44,14 @@ public class ConvertUtils {
             }
             return baos.toByteArray();
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tinputStreamToBytes\t" + e.getMessage());
+            e.printStackTrace();
             return null;
         } finally {
             try {
                 baos.close();
                 is.close();
             } catch (IOException e) {
-                LogManager.getInstance().write(TAG + "\tinputStreamToBytes\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -69,7 +69,7 @@ public class ConvertUtils {
             if(StringUtils.isNullOrSpace(encoding)) return new String(bs);
             return new String(bs, encoding);
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tinputStreamToString\t" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -90,13 +90,13 @@ public class ConvertUtils {
             bais = new ByteArrayInputStream(bs);
             return bais;
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tstringToInputStream\t" + e.getMessage());
+            e.printStackTrace();
             return null;
         } finally {
             try {
                 bais.close();
             } catch (IOException e) {
-                LogManager.getInstance().write(TAG + "\tstringToInputStream\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -123,13 +123,13 @@ public class ConvertUtils {
                 return baos.toByteArray();
             }
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tfileToBytes\t" + e.getMessage());
+            e.printStackTrace();
         } finally {
             try {
                 baos.close();
                 fis.close();
             } catch (IOException e) {
-                LogManager.getInstance().write(TAG + "\tfileToBytes\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
         return null;
@@ -162,12 +162,12 @@ public class ConvertUtils {
             bos.write(bts);
             return f;
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tbytesToFile\t" + e.getMessage());
+            e.printStackTrace();
         } finally {
             try {
                 bos.close();
             } catch (Exception e) {
-                LogManager.getInstance().write(TAG + "\tbytesToFile\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
         return null;
@@ -184,7 +184,7 @@ public class ConvertUtils {
             byte[] bts = fileToBytes(path);
             return Base64.encodeToString(bts, Base64.DEFAULT);
         } catch(Exception e) {
-            LogManager.getInstance().write(TAG + "\tfileToBase64\t" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -202,7 +202,7 @@ public class ConvertUtils {
             byte[] bts = Base64.decode(s.getBytes(), Base64.DEFAULT);
             return bytesToFile(bts, path);
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tbase64ToFile\t" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -224,13 +224,13 @@ public class ConvertUtils {
             byte[] bs = Base64.encode(baos.toByteArray(), Base64.DEFAULT);
             result = new String(bs);
         } catch (IOException e) {
-            LogManager.getInstance().write(TAG + "\tentityToBase64\t" + e.getMessage());
+            e.printStackTrace();
         } finally {
             try {
                 baos.close();
                 oos.close();
             } catch (IOException e) {
-                LogManager.getInstance().write(TAG + "\tentityToBase64\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
         return result;
@@ -252,13 +252,13 @@ public class ConvertUtils {
             ois = new ObjectInputStream(bais);
             result = ois.readObject();
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tbase64ToEntity\t" + e.getMessage());
+            e.printStackTrace();
         }finally{
             try {
                 ois.close();
                 bais.close();
             } catch (IOException e) {
-                LogManager.getInstance().write(TAG + "\tbase64ToEntity\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
         return result;
@@ -279,12 +279,12 @@ public class ConvertUtils {
             list = (List<T>)ois.readObject();
             ois.close();
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tbase64ToList\t" + e.getMessage());
+            e.printStackTrace();
         } finally{
             try {
                 bais.close();
             } catch (IOException e) {
-                LogManager.getInstance().write(TAG + "\tbase64ToList\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
         return list;
@@ -319,7 +319,7 @@ public class ConvertUtils {
             }
             return bitmap;
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tpictureToBitmap\t" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -336,7 +336,7 @@ public class ConvertUtils {
             byte[] bitmapArray = Base64.decode(s, Base64.DEFAULT);
             bmp = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tbase64ToBitmap\t" + e.getMessage());
+            e.printStackTrace();
         }
         return bmp;
     }
@@ -359,13 +359,13 @@ public class ConvertUtils {
             byte[] bs = baos.toByteArray();
             return Base64.encodeToString(bs, Base64.DEFAULT);
         } catch (Exception e) {
-            LogManager.getInstance().write(TAG + "\tbitmapToBase64\t" + e.getMessage());
+            e.printStackTrace();
             return null;
         } finally {
             try {
                 baos.close();
             } catch (IOException e) {
-                LogManager.getInstance().write(TAG + "\tbitmapToBase64\t" + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -401,7 +401,7 @@ public class ConvertUtils {
             }
         } catch (Exception e) {
             ret = null;
-            LogManager.getInstance().write(TAG + "\tstringToBytes\t" + e.getMessage());
+            e.printStackTrace();
         }
         return ret;
     }
@@ -421,7 +421,7 @@ public class ConvertUtils {
             try {
                 bts = s.getBytes(encoding);
             } catch (UnsupportedEncodingException e) {
-                LogManager.getInstance().write(TAG + "/tstringToBytes/t" + e.getMessage());
+                e.printStackTrace();
             }
         }
         return bts;
@@ -442,7 +442,7 @@ public class ConvertUtils {
             try {
                 s = new String(bts, encoding);
             } catch (UnsupportedEncodingException e) {
-                LogManager.getInstance().write(TAG + "/tbytesToString/t" + e.getMessage());
+                e.printStackTrace();
             }
         }
         return s;
