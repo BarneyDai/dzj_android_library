@@ -80,7 +80,7 @@ echo "copyScript end."
 function writePropertes(){
 echo "根据jenkins配置，替换关键配置"
 #是否来自jenjins的打包，避免本地打包时使用这份配置
-sed -i "" "s/FROM_JENKINS=.*/FROM_JENKINS=${FROM_JENKINS}/g" ${FILE_PAEM_PROTERTIES}
+sed -i "s/FROM_JENKINS=.*/FROM_JENKINS=${FROM_JENKINS}/g" ${FILE_PAEM_PROTERTIES}
 
 echo "根据jenkins配置，写入关键配置完成"
 }
