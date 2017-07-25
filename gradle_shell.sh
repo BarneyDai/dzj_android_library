@@ -81,20 +81,6 @@ function writePropertes(){
 echo "根据jenkins配置，替换关键配置"
 #是否来自jenjins的打包，避免本地打包时使用这份配置
 sed -i "" "s/FROM_JENKINS=.*/FROM_JENKINS=${FROM_JENKINS}/g" ${FILE_PAEM_PROTERTIES}
-#sdk name
-sed -i "" "s/SDK_NAME=.*/SDK_NAME=${SDK_NAME}/g" ${FILE_PAEM_PROTERTIES}
-#kepler_config.xml配置,混合框架配置文件配置
-sed -i "" "s/SDK_VERSION_CODE=.*/SDK_VERSION_CODE=${SDK_VERSION_CODE}/g" ${FILE_PAEM_PROTERTIES}
-sed -i "" "s/SDK_VERSION_NAME=.*/SDK_VERSION_NAME=${SDK_VERSION_NAME}/g" ${FILE_PAEM_PROTERTIES}
-sed -i "" "s/ILoanLib_Jar_Png_version=.*/ILoanLib_Jar_Png_version=${ILoanLib_Jar_Png_version}/g" ${FILE_PAEM_PROTERTIES}
-
-sed -i "" "s/DIR_WORKSPACE=.*/DIR_WORKSPACE=${DIR_WORKSPACE}/g" ${FILE_PAEM_PROTERTIES}
-sed -i "" "s/DIR_PROJECT=.*/DIR_PROJECT=${DIR_PROJECT}/g" ${FILE_PAEM_PROTERTIES}
-sed -i "" "s/DIR_DEPLOY=.*/DIR_DEPLOY=${DIR_DEPLOY}/g" ${FILE_PAEM_PROTERTIES}
-
-#jenkins参数，job名和构建时间戳
-sed -i "" "s/JOB_NAME=.*/JOB_NAME=${JOB_NAME}/g" ${FILE_PAEM_PROTERTIES}
-sed -i "" "s/BUILD_NUMBER=.*/BUILD_NUMBER=${BUILD_NUMBER}/g" ${FILE_PAEM_PROTERTIES}
 
 echo "根据jenkins配置，写入关键配置完成"
 }
