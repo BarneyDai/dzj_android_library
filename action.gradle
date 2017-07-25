@@ -1,0 +1,325 @@
+import groovy.util.slurpersupport.GPathResult
+import groovy.util.XmlSlurper
+//解析XML时候要引入这个groovy的package
+
+import groovy.xml.StreamingMarkupBuilder
+import org.gradle.api.invocation.Gradle
+import groovy.json.JsonSlurper
+
+
+def readPaemJenkinsProperties(def properties){
+
+    def pFile = file(properties)
+    if(pFile.exists()){
+        Properties p = new Properties()
+        pFile.withInputStream { stream->
+            p.load(stream)
+        }
+
+        gradle.ext.FROM_JENKINS=p.FROM_JENKINS
+        println 'Paem.properties come from jenkins is '+gradle.FROM_JENKINS
+
+        gradle.ext.SDK_NAME = p.SDK_NAME
+        println 'SDK_NAME is '+gradle.SDK_NAME
+
+        gradle.ext.SDK_VERSION_CODE = p.SDK_VERSION_CODE
+        println 'SDK_VERSION_CODE is '+gradle.SDK_VERSION_CODE
+
+        gradle.ext.SDK_VERSION_NAME = p.SDK_VERSION_NAME
+        println 'SDK_VERSION_NAME is '+gradle.SDK_VERSION_NAME
+
+        gradle.ext.DIR_WORKSPACE = p.DIR_WORKSPACE
+        println 'DIR_WORKSPACE is '+gradle.DIR_WORKSPACE
+
+        gradle.ext.DIR_PROJECT = p.DIR_PROJECT
+        println 'DIR_PROJECT is '+gradle.DIR_PROJECT
+
+        gradle.ext.DIR_DEPLOY=p.DIR_DEPLOY
+        println 'DIR_DEPLOY is '+gradle.DIR_DEPLOY
+
+        gradle.ext.TIME_STAMP=getDate()
+        println 'TIME_STAMP is '+gradle.TIME_STAMP
+
+        gradle.ext.BUILD_NUMBER=p.BUILD_NUMBER
+        println 'BUILD_NUMBER is '+gradle.BUILD_NUMBER
+
+        gradle.ext.JOB_NAME=p.JOB_NAME
+        println 'JOB_NAME is '+gradle.JOB_NAME
+
+        gradle.ext.ILoanLib_Jar_Png_version=p.ILoanLib_Jar_Png_version
+        println 'ILoanLib_Jar_Png_version is '+gradle.ILoanLib_Jar_Png_version
+
+        println '**************************************************'
+    }
+}
+
+
+def modifyHybridXml(){
+    println 'set kepler_config.xml started'
+    def projectDir =gradle.DIR_PROJECT
+
+    def sdkVersionName =  gradle.SDK_VERSION_NAME
+    def sdkVersionCode = gradle.SDK_VERSION_CODE
+
+    def file =new File(projectDir+"/ILoanLib/res/xml/kepler_config.xml")
+    def content = file.text
+
+    //println content
+
+    //pattern = ~ "sdkVersionName value=\".*\""
+    //matcher = pattern.matcher(content)
+    //content = matcher.replaceAll("sdkVersionName value=\"${sdkVersionName}\"")
+    //println 'set environment sdkVersionName '+sdkVersionName+' successed'
+
+    //pattern = ~ "sdkVersionCode value=\".*\""
+    //matcher = pattern.matcher(content)
+    //content = matcher.replaceAll("sdkVersionCode value=\"${sdkVersionCode}\"")
+    //println 'set environment sdkVersionCode '+sdkVersionCode+' successed'
+
+    file.write(content)
+    println 'set kepler_config.xml finshed'
+}
+
+
+def modifyAppName(){
+    def appName =gradle.SDK_NAME
+
+    def projectDir =gradle.DIR_PROJECT
+    def time = gradle.TIME_STAMP
+
+    if('TIMESTAMP'.equals(appName)){
+        def timeStampAppName ="${time}${envName}"
+        def file =new File(projectDir+"/KeplerDemo/res/values/strings.xml")
+        def input = file.text
+        def pattern = ~ "app_name\">.*</string"
+        def matcher = pattern.matcher(input)
+        def newString = matcher.replaceAll("app_name\">${timeStampAppName}</string")
+        file.write(newString)
+    }
+    println 'set appName in strings.xml finshed'
+}
+
+def cleanProject(){
+    def projectDir =gradle.DIR_PROJECT
+    deleteDir(projectDir+'/KeplerDemo/build')
+    deleteDir(projectDir+'/ILoanLib/build')
+    deleteDir(projectDir+'/PaemPluginSDK/build')
+    deleteDir(projectDir+'/ILoanPlugin/build')
+    deleteDir(projectDir+'/pahybrid/build')
+    deleteDir(projectDir+'/basiclibrary/build')
+}
+
+//===========================================================
+
+//最后检查配置是否正确
+def checkLast(){
+    println "==================checkConfig start=================="
+    def projectDir =gradle.DIR_PROJECT
+    
+    def sdkVersionName = gradle.SDK_VERSION_NAME
+    def sdkVersionCode = gradle.SDK_VERSION_CODE
+
+    def hybridXmlPath =  "${projectDir}/ILoanLib/res/xml/kepler_config.xml"
+
+    def hybridXmlText = new File(hybridXmlPath).text
+    def hybridXmlRoot = new XmlSlurper().parseText(hybridXmlText)
+
+    def isCheckSsEnvTag=false
+    def isCheckPAF_ENV=false
+
+
+    hybridXmlRoot["ConfigGroup"].each {
+        if(it['@name'] == "SS_ENV"){
+            println 'start check ss env'
+            assert it['@env']==ssEnv
+            assert it.sdkVersionName['@value']==sdkVersionName
+            assert it.sdkVersionCode['@value']==sdkVersionCode
+
+            def ssEnvTAG = (ssEnv == 'prd')?'kepler_prd':'kepler_stg';
+            it["ConfigGroup"].each{
+                if(it['@name'] == ssEnvTAG){
+                    println 'start check detailed ss env '+ssEnvTAG
+                    assert it.IS_ONLINE_FOR_H5['@value']==isOnlineForH5
+                    assert it.isUpdateResource['@value']==isUpdateResource
+//                    assert it.url_module_json_info_base['@value']==url_module_json_info_base
+//                    assert it.url_baseUrl['@value']==url_baseUrl
+                    isCheckSsEnvTag=true
+                }
+            }
+        }else if(it['@name'] == "PAF_ENV"){
+            println 'start check detailed paf env'
+            assert it['@env']==pafEnv
+            isCheckPAF_ENV=true
+        }
+    }
+
+
+    assert isCheckSsEnvTag&isCheckPAF_ENV
+    println "===================checkConfig finished==================="
+}
+
+//===========================================================
+
+//将apk备份到output,生产备份release，测试备份debug
+def bacOutputApk(){
+    
+    def versionCode = gradle.SDK_VERSION_CODE
+    def timestamp = gradle.TIME_STAMP
+    def workspace = gradle.DIR_WORKSPACE
+    def projectDir = gradle.DIR_PROJECT
+    def buildNumber = gradle.BUILD_NUMBER
+
+    def backupDir = new File("${workspace}/outputs/demoapk/${timestamp}-build${buildNumber}")
+    if(!backupDir.exists()){
+        backupDir.mkdir()
+    }
+    def APK_TO_NAME = "KeplerDemo-v${versionCode}-${timestamp}-build${buildNumber}-"+'debug.apk'
+    println 'APK_TO_NAME '+ APK_TO_NAME
+// 把apk包拷贝到/Users/Shared/AndroidBuild文件夹里，并做过滤，去除-unaligned.apk结尾的包
+    copy {
+        from("${projectDir}/KeplerDemo/build/outputs/apk")
+        into(backupDir)
+        include '*debug.apk'
+        exclude '**/*-unaligned.apk'
+        rename '(.*)apk', APK_TO_NAME
+    }
+
+    //拷贝最新的apk，到指定位置/output/KeplerDemo.apk
+    def backupDir2 = new File("${workspace}/outputs/")
+    def APK_TO_NAME2 = "KeplerDemo.apk"
+    File f = new File("${workspace}/outputs/demoapk/KeplerDemo.apk")
+    if(f && f.exists()){
+        println "已存在该文件，先删除"
+        f.delete()
+    }
+
+    println 'APK_TO_NAME2 '+ APK_TO_NAME2
+    copy {
+        from("${projectDir}/KeplerDemo/build/outputs/demoapk/apk")
+        into(backupDir2)
+        include '*debug.apk'
+        exclude '**/*-unaligned.apk'
+        rename '(.*)apk', APK_TO_NAME2
+    }
+}
+//
+def deploy(){
+    def ssEnv =gradle.SS_ENV
+    def envName = gradle.ENV_NAME
+    def jobName = gradle.JOB_NAME
+    def projectDir = gradle.DIR_PROJECT
+    def deployRootDir=gradle.DIR_DEPLOY
+    def buildNumber = gradle.BUILD_NUMBER
+
+    def DIR_APK_FROM ="${projectDir}/KeplerDemo/build/outputs/apk"
+
+    def DIR_APK_TO = "${deployRootDir}/${jobName}/${envName}"
+    def APK_TO_NAME="KeplerDemo-${envName}-build${buildNumber}.apk"
+
+    def toDir = new File(DIR_APK_TO)
+    def toFile = new File("${DIR_APK_TO}/${APK_TO_NAME}")
+
+    if(!toDir.exists()){
+        toDir.mkdirs()
+    }
+
+    def files =toDir.listFiles()
+    if(files){
+        for(f in files){
+            if(f.exists()){
+                println "删除旧的apk："+f.name
+                f.delete()
+            }
+        }
+    }
+
+
+    if(toFile.exists()){
+        toFile.delete()
+    }
+    def prd ='prd'.equals(ssEnv)
+    copy {
+        from(DIR_APK_FROM)
+        into(DIR_APK_TO)
+        include prd?'*release.apk':'*debug.apk'
+        exclude '**/*-unaligned.apk'
+        rename '(.*)apk', APK_TO_NAME
+    }
+    println "deploy from ${DIR_APK_FROM} to ${DIR_APK_TO}/${APK_TO_NAME} successed"
+}
+
+
+//==========================暴露接口================================
+def beforeBuild(properties){
+//从配置文件读取环境配置，该配置应该由jenkins平台修改。 有个参数，from_jenkins＝true，就修改配置，否则不修改配置
+    readPaemJenkinsProperties(properties)
+    if('true'!=gradle.FROM_JENKINS){
+        println 'if not build in jenkins ,do not replace the configs and resources!'
+        return
+    }
+
+//    modifyHybridXml()
+
+    //modifyAppName()
+
+//clean
+    cleanProject()
+
+//检查配置结果s
+    //checkLast()
+
+
+
+//另外，可以每次编译前执行gradle clean，以免有远程库没有更新
+}
+
+def afterBuild(){
+    println 'afterBuild start'
+    if('true'==gradle.FROM_JENKINS){
+        bacOutputApk()
+//        deploy()
+    }
+    println 'afterBuild finished'
+}
+
+//=========================utils===================
+//获取时间戳
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMddHHmm')
+    println 'getDate:'+formattedDate
+    return formattedDate
+}
+
+def deleteDir(dir){
+    def buildFile = new File(dir)
+    if(buildFile.exists()){
+        buildFile.deleteDir()
+    }
+}
+
+//拷贝文件函数，用于将最后的生成物拷贝到指定的目录
+def copyFile(String srcFileName,dstFileName){
+    println 'copy file, from '+srcFileName+' to '+dstFileName
+    def srcFile = new File(srcFileName)
+    def targetFile = new File(dstFileName)
+    if(targetFile.exists()){
+        targetFile.delete()
+    }
+    def targetParent = targetFile.getParentFile()
+    if(!targetParent.exists()){
+        targetParent.mkdirs()
+    }
+    targetFile.withOutputStream{ os->
+        srcFile.withInputStream{ ins->
+            os << ins   //利用OutputStream的<<操作符重载，完成从inputstream到OutputStream
+        }
+    }
+    println 'copy file seccessed'
+}
+//==========================================
+//将函数设置为extra属性中去，这样，加载utils.gradle的Project就能调用此文件中定义的函数了
+ext{
+    afterBuild = this.&afterBuild
+    beforeBuild = this.&beforeBuild
+}

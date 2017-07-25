@@ -1,1 +1,4 @@
+apply from: "./action.gradle"
+beforeBuild('./Paem.properties')
+
 include ':app', ':BasicLibrary', ':BasicViews', ':BasicCompents', ':BV_XListView', ':BC_CustomCamera', ':BasicNet'
