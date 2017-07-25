@@ -258,6 +258,7 @@ def beforeBuild(properties){
         return
     }
 
+    println 'build in jenkins!'
 //    modifyHybridXml()
 
     //modifyAppName()
