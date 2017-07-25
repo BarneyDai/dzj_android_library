@@ -14,9 +14,6 @@ DIR_WORKSPACE=${WORKSPACE//\//\\\/}
 echo ${DIR_WORKSPACE}
 DIR_PROJECT="${DIR_WORKSPACE}\/tmp"
 
-#发布在线apk的目录
-DIR_DEPLOY="\/Users\/Tiger\/share\/CFS-PAEM\/Android"
-
 #============================ path =================================
 DIR_PROJ_PATH=${WORKSPACE}/${PROJ_DIR}
 DIR_PROJ_BAK_PATH=${WORKSPACE}/tmp
@@ -103,7 +100,7 @@ echo "根据jenkins配置，写入关键配置完成"
 }
 
 #============================= start ============================
-#backProj
+backProj
 
 #copyScript
 
