@@ -104,6 +104,6 @@ backProj
 
 #copyScript
 
-#writePropertes
+writePropertes
 
 #转gradle脚本
